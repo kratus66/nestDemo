@@ -1,5 +1,8 @@
 import { Injectable } from "@nestjs/common";
 
+import {User} from "../Interfaces/User";
+import { UserDto } from "./users.service";
+
 
 @Injectable()
 export class UserRepository{
@@ -57,8 +60,48 @@ export class UserRepository{
         }
     ];
     
-
-    async getUser(){
-        return this.users;
+    findId(id: number): User | null {
+        const user = this.users.find(user => user.id === id);
+        if (user) {
+            const { password, ...userOutPassword } = user;
+            return userOutPassword as User;
+        }
+        return null;
     }
+
+    getUser(page:number,limit:number): UserDto[] {
+        const startIndex = (page - 1) * limit;
+        const endIndex = startIndex + limit;
+        return this.users
+        .slice(startIndex, endIndex)
+        .map(({ password, ...userWithoutPassword }) => userWithoutPassword);
+    }
+
+    createUserRepository(user: User): User {
+        const newId = this.users.length > 0 ? this.users[this.users.length - 1].id + 1 : 1;
+        const newUser = { id: newId, ...user };
+        this.users.push(newUser);
+        return newUser;
+    }
+
+    updateUserRepository(id: number, updateUser: User): User | null {
+        let updatedUserResult: User | null = null;
+        this.users = this.users.map(user => {
+            if (user.id === id) {
+                updatedUserResult = { ...user, ...updateUser };
+                return updatedUserResult;
+            }
+            return user;
+        });
+        return updatedUserResult;
+    }
+
+    deleteUser(id: number): void {
+        this.users = this.users.filter(user => user.id !== id);
+    }
+    findByEmail(email: string): User | undefined {
+        return this.users.find(user => user.email === email);
+    }
+    
+
 }

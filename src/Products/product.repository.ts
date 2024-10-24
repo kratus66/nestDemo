@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { Product } from "src/Interfaces/Product";
 
 
 @Injectable()
@@ -46,7 +47,43 @@ export class ProductRepository{
         }
     ];
     
-    getProduct(){
-        return this.products;
+    getProducts(page:number,limit:number): Product[] {
+
+        const startIndex=(page-1)*limit;
+        const endIndex=startIndex + limit;
+
+        return this.products.slice(startIndex,endIndex);
+    }
+
+    // Obtener un producto por su ID
+    getProductById(id: number): Product | null {
+        const product = this.products.find(product => product.id === id);
+        return product || null;
+    }
+
+    // Crear un nuevo producto
+    createProduct(newProduct: Omit<Product, 'id'>): Product {
+        const newId = this.products.length > 0 ? this.products[this.products.length - 1].id + 1 : 1;
+        const productWithId = { id: newId, ...newProduct };
+        this.products.push(productWithId);
+        return productWithId;
+    }
+
+    // Actualizar un producto existente
+    updateProduct(id: number, updateProduct: Partial<Product>): Product | null {
+        let updatedProduct: Product | null = null;
+        this.products = this.products.map(product => {
+            if (product.id === id) {
+                updatedProduct = { ...product, ...updateProduct };
+                return updatedProduct;
+            }
+            return product;
+        });
+        return updatedProduct;
+    }
+
+    // Eliminar un producto por su ID
+    deleteProduct(id: number): void {
+        this.products = this.products.filter(product => product.id !== id);
     }
 }
