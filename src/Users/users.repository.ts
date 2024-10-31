@@ -1,107 +1,70 @@
-import { Injectable } from "@nestjs/common";
-
-import {User} from "../Interfaces/User";
-import { UserDto } from "./users.service";
-
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { User } from "./users.entity";
+import { UserDto } from "./user.dto";
 
 @Injectable()
-export class UserRepository{
-    
-    private users = [
-        {
-            id: 1,
-            name: "Diego Herrera",
-            email: "diego@gmail.com",
-            password: "password123",
-            address: "123 Calle Principal",
-            phone: "555-1234",
-            country: "Colombia",
-            city: "Bogotá"
-        },
-        {
-            id: 2,
-            name: "Maria Rojas",
-            email: "maria@gmail.com",
-            password: "maria456",
-            address: "456 Calle Secundaria",
-            phone: "555-5678",
-            country: "Colombia",
-            city: "Medellín"
-        },
-        {
-            id: 3,
-            name: "Juan Herrera",
-            email: "juan@gmail.com",
-            password: "juan789",
-            address: "789 Calle Tercera",
-            phone: "555-9012",
-            country: "Argentina",
-            city: "Buenos Aires"
-        },
-        {
-            id: 4,
-            name: "Luis Pérez",
-            email: "luisp@gmail.com",
-            password: "luisP321",
-            address: "321 Avenida Central",
-            phone: "555-3456",
-            country: "México",
-            city: "Ciudad de México"
-        },
-        {
-            id: 5,
-            name: "Ana Gómez",
-            email: "ana@gmail.com",
-            password: "anaG123",
-            address: "654 Calle Cuarta",
-            phone: "555-7890",
-            country: "España",
-            city: "Madrid"
-        }
-    ];
-    
-    findId(id: number): User | null {
-        const user = this.users.find(user => user.id === id);
-        if (user) {
-            const { password, ...userOutPassword } = user;
-            return userOutPassword as User;
-        }
-        return null;
-    }
+export class UserRepository {
+    constructor(
+        @InjectRepository(User)
+        private readonly userRepo: Repository<User>,
+    ) {}
 
-    getUser(page:number,limit:number): UserDto[] {
-        const startIndex = (page - 1) * limit;
-        const endIndex = startIndex + limit;
-        return this.users
-        .slice(startIndex, endIndex)
-        .map(({ password, ...userWithoutPassword }) => userWithoutPassword);
-    }
-
-    createUserRepository(user: User): User {
-        const newId = this.users.length > 0 ? this.users[this.users.length - 1].id + 1 : 1;
-        const newUser = { id: newId, ...user };
-        this.users.push(newUser);
-        return newUser;
-    }
-
-    updateUserRepository(id: number, updateUser: User): User | null {
-        let updatedUserResult: User | null = null;
-        this.users = this.users.map(user => {
-            if (user.id === id) {
-                updatedUserResult = { ...user, ...updateUser };
-                return updatedUserResult;
-            }
-            return user;
+    // Obtener usuarios con paginación
+    async getUsers(page: number, limit: number): Promise<UserDto[]> {
+        const [users] = await this.userRepo.findAndCount({
+            skip: (page - 1) * limit,
+            take: limit,
+            select: ["id", "name", "email", "address", "phone", "country", "city"],
         });
-        return updatedUserResult;
+        return users;
     }
 
-    deleteUser(id: number): void {
-        this.users = this.users.filter(user => user.id !== id);
-    }
-    findByEmail(email: string): User | undefined {
-        return this.users.find(user => user.email === email);
-    }
-    
+    // Obtener usuario por ID incluyendo órdenes
+    async findByIdWithOrders(userId: string): Promise<User> {
+        const user = await this.userRepo.findOne({
+            where: { id: userId },
+            relations: ["orders"],
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                address: true,
+                phone: true,
+                country: true,
+                city: true,
+                orders: {
+                    id: true,
+                    date: true,
+                },
+            },
+        });
 
+        if (!user) {
+            throw new NotFoundException(`User with ID ${userId} not found`);
+        }
+
+        return user;
+    }
+
+    // Crear usuario
+    async createUser(user: User): Promise<User> {
+        const newUser = this.userRepo.create(user);
+        return await this.userRepo.save(newUser);
+    }
+
+    // Actualizar usuario
+    async updateUser(id: string, updateUser: Partial<User>): Promise<User | null> {
+        await this.userRepo.update(id, updateUser);
+        return this.findByIdWithOrders(id);
+    }
+
+    // Eliminar usuario
+    async deleteUser(id: string): Promise<void> {
+        await this.userRepo.delete(id);
+    }
+    async findByEmail(email: string): Promise<User | undefined> {
+        return await this.userRepo.findOne({ where: { email } });
+    }
 }

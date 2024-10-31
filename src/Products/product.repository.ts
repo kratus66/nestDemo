@@ -1,89 +1,48 @@
 import { Injectable } from "@nestjs/common";
-import { Product } from "src/Interfaces/Product";
-
+import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Product } from "./product.entity";
 
 @Injectable()
-export class ProductRepository{
-    private products = [
-        {
-            id: 1,
-            name: "Monitor Curvo",
-            description: "Monitor Samsung Curvo 27 Fhd Diseño Sin Bordes LC27R500 Dark blue gray 100V/240V",
-            price: 150.99,
-            stock: true,
-            imgUrl: "https://example.com/monitor.jpg"
-        },
-        {
-            id: 2,
-            name: "Tecno Spark Go",
-            description: "Tecno Spark Go (2024) Dual SIM 128 GB negro 4 GB RAM",
-            price: 120.00,
-            stock: true,
-            imgUrl: "https://example.com/spark-go.jpg"
-        },
-        {
-            id: 3,
-            name: "Laptop HP Pavilion",
-            description: "HP Pavilion 15 Laptop, 11th Gen Intel Core i7, 16GB RAM, 512GB SSD",
-            price: 899.99,
-            stock: true,
-            imgUrl: "https://example.com/laptop-hp.jpg"
-        },
-        {
-            id: 4,
-            name: "Teclado Mecánico RGB",
-            description: "Teclado Mecánico RGB para Gaming con Switches Blue, retroiluminación LED",
-            price: 49.99,
-            stock: false,
-            imgUrl: "https://example.com/teclado-rgb.jpg"
-        },
-        {
-            id: 5,
-            name: "Audífonos Bluetooth",
-            description: "Audífonos Inalámbricos Bluetooth con cancelación de ruido y batería de 30 horas",
-            price: 79.99,
-            stock: true,
-            imgUrl: "https://example.com/audifonos.jpg"
-        }
-    ];
-    
-    getProducts(page:number,limit:number): Product[] {
+export class ProductRepository {
+    constructor(
+        @InjectRepository(Product)
+        private readonly productRepo: Repository<Product>,
+    ) {}
 
-        const startIndex=(page-1)*limit;
-        const endIndex=startIndex + limit;
-
-        return this.products.slice(startIndex,endIndex);
+    getProducts(page: number, limit: number): Promise<Product[]> {
+        const skip = (page - 1) * limit;
+        return this.productRepo.find({
+            skip,
+            take: limit,
+        });
     }
 
     // Obtener un producto por su ID
-    getProductById(id: number): Product | null {
-        const product = this.products.find(product => product.id === id);
-        return product || null;
+    getProductById(id: string): Promise<Product | null> {
+        return this.productRepo.findOne({ where: { id } });
     }
 
     // Crear un nuevo producto
-    createProduct(newProduct: Omit<Product, 'id'>): Product {
-        const newId = this.products.length > 0 ? this.products[this.products.length - 1].id + 1 : 1;
-        const productWithId = { id: newId, ...newProduct };
-        this.products.push(productWithId);
-        return productWithId;
+    async createProduct(newProduct: Partial<Omit<Product, 'id'>>): Promise<Product> {
+        const product = this.productRepo.create(newProduct);
+        return await this.productRepo.save(product);
     }
 
     // Actualizar un producto existente
-    updateProduct(id: number, updateProduct: Partial<Product>): Product | null {
-        let updatedProduct: Product | null = null;
-        this.products = this.products.map(product => {
-            if (product.id === id) {
-                updatedProduct = { ...product, ...updateProduct };
-                return updatedProduct;
-            }
-            return product;
-        });
-        return updatedProduct;
+    async updateProduct(id: string, updateProduct: Partial<Product>): Promise<Product | null> {
+        await this.productRepo.update(id, updateProduct);
+        return this.getProductById(id);
     }
 
     // Eliminar un producto por su ID
-    deleteProduct(id: number): void {
-        this.products = this.products.filter(product => product.id !== id);
+    async deleteProduct(id: string): Promise<void> {
+        await this.productRepo.delete(id);
+    }
+
+    // Obtener todos los productos para evitar duplicados
+    findAll(): Promise<Product[]> {
+        return this.productRepo.find();
     }
 }
+
