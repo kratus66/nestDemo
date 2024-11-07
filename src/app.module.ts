@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import typeOrmConfig from "./config/typeorm";
 import { CategoryModule } from './Category/category.module';
+import { FilesModule } from './Cloudinary/files.module'; // Ajuste de la ruta
 
 @Module({
     imports: [
@@ -16,14 +17,15 @@ import { CategoryModule } from './Category/category.module';
         TypeOrmModule.forRootAsync({
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => configService.get("typeorm"),
-            
         }),
         AuthModule,
         UserModule,
         ProductModule,
-        CategoryModule
+        CategoryModule,
+        FilesModule,
     ]
 })
 export class AppModule {}
+
 
 

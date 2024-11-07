@@ -7,14 +7,12 @@ import productData from "../data/products.json";
 @Injectable()
 export class ProductService {
     constructor(
-        private productRepository: ProductRepository,
+        private readonly productRepository: ProductRepository,  // Inyecta ProductRepository en lugar de Repository<Product>
         private categoryRepository: CategoryRepository,
     ) {}
 
-    // Seed products desde archivo JSON
     async seedProducts() {
         const existingProducts = await this.productRepository.findAll();
-
         const newProducts = productData.filter(
             (newProduct) => !existingProducts.some((prod) => prod.name === newProduct.name)
         );
@@ -23,11 +21,7 @@ export class ProductService {
             const category = await this.categoryRepository.findByName(product.category);
             if (category) {
                 const stockValue = typeof product.stock === 'boolean' ? (product.stock ? 1 : 0) : product.stock;
-                await this.createProduct({
-                    ...product,
-                    stock: stockValue,
-                    category: category.name, // Pasamos el nombre de la categoría
-                });
+                await this.createProduct({ ...product, stock: stockValue, category: category.name });
             }
         }
         return newProducts;
@@ -50,30 +44,13 @@ export class ProductService {
         if (!category) {
             throw new Error(`Category with name ${productData.category} not found`);
         }
-
         const stockValue = typeof productData.stock === 'boolean' ? (productData.stock ? 1 : 0) : productData.stock;
-
-        return this.productRepository.createProduct({
-            ...productData,
-            stock: stockValue,
-            category,
-        });
+        return this.productRepository.createProduct({ ...productData, stock: stockValue, category });
     }
 
     async updateProduct(id: string, productData: Partial<Omit<Product, 'id' | 'category'>> & { category?: string }): Promise<Product | null> {
         const category = productData.category ? await this.categoryRepository.findByName(productData.category) : undefined;
-
         const stockValue = typeof productData.stock === 'boolean' ? (productData.stock ? 1 : 0) : productData.stock;
-
-        return this.productRepository.updateProduct(id, {
-            ...productData,
-            stock: stockValue,
-            category,
-        });
+        return this.productRepository.updateProduct(id, { ...productData, stock: stockValue, category });
     }
 }
-
-
-
-
-

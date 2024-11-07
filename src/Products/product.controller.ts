@@ -32,31 +32,16 @@ export class ProductController {
     @UseGuards(AuthGuard)
     @Post()
     async createProduct(@Body() product: Omit<Product, 'id'> & { category: string }, @Res() res: Response) {
-        // Convertimos stock a número si es booleano
         const stockValue = typeof product.stock === 'boolean' ? (product.stock ? 1 : 0) : product.stock;
-
-        // Llamamos a `createProduct` pasando el nombre de la categoría como `category`
-        const newProduct = await this.productService.createProduct({
-            ...product,
-            stock: stockValue, // Ajuste en stock
-            category: product.category, // Aseguramos que `category` está presente
-        });
-
+        const newProduct = await this.productService.createProduct({ ...product, stock: stockValue, category: product.category });
         return res.status(HttpStatus.CREATED).json({ id: newProduct.id });
     }
 
     @UseGuards(AuthGuard)
     @Put(':id')
     async updateProduct(@Param('id') id: string, @Body() product: Partial<Product> & { category?: string }, @Res() res: Response) {
-        // Convertimos stock a número si es booleano
         const stockValue = typeof product.stock === 'boolean' ? (product.stock ? 1 : 0) : product.stock;
-
-        const updatedProduct = await this.productService.updateProduct(id, {
-            ...product,
-            stock: stockValue,
-            category: product.category,
-        });
-
+        const updatedProduct = await this.productService.updateProduct(id, { ...product, stock: stockValue, category: product.category });
         if (updatedProduct) {
             return res.status(HttpStatus.OK).json({ id: updatedProduct.id });
         }
@@ -70,3 +55,4 @@ export class ProductController {
         return res.status(HttpStatus.OK).json({ message: `Product with ID ${id} deleted successfully` });
     }
 }
+

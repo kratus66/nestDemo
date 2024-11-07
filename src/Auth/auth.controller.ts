@@ -1,37 +1,21 @@
-import { Controller, Post, Body, Res, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Response } from 'express';
+import { LoginUserDto } from '../Dto/LoginUserDto';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
-    @Post('signin')
-    async signIn(
-        @Body('email') email: string,
-        @Body('password') password: string,
-        @Res() res: Response
-    ) {
-        // Verificamos que ambas credenciales estén presentes
-        if (!email || !password) {
-            return res.status(HttpStatus.BAD_REQUEST).json({
-                message: 'Email and password are required.',
-            });
-        }
+  @Post('signin')
+  @HttpCode(HttpStatus.OK)
+  async signIn(@Body() loginUserDto: LoginUserDto): Promise<{ message: string }> {
+    const isAuthenticated = await this.authService.signIn(loginUserDto.email, loginUserDto.password);
 
-        // Llamamos al servicio de autenticación
-        const result = await this.authService.signIn(email, password);
-
-        if (!result) {
-            return res.status(HttpStatus.UNAUTHORIZED).json({
-                message: 'Email or password incorrect',
-            });
-        }
-
-        // Si todo es correcto
-        return res.status(HttpStatus.OK).json({
-            message: 'Login successful',
-        });
+    if (!isAuthenticated) {
+      throw new Error('Credenciales incorrectas');
     }
+
+    return { message: 'Inicio de sesión exitoso' };
+  }
 }
 
