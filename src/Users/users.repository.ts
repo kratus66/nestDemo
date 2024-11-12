@@ -27,8 +27,9 @@ export class UserRepository {
     async findByEmail(email: string): Promise<User | null> { // Agrega este método
         return this.userRepo.findOne({ where: { email } });
     }
-    async createUser(user: User): Promise<User> {
-        return this.userRepo.save(user);
+    async createUser(userData: Partial<User>): Promise<User> {
+        const newUser = this.userRepo.create(userData);
+        return this.userRepo.save(newUser);
     }
 
     async updateUser(id: string, updateUser: Partial<User>): Promise<User | null> {

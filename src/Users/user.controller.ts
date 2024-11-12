@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, HttpStatus, HttpCode, Res, Query, UseGuards, HttpException, ParseUUIDPipe } from "@nestjs/common";
+import { Controller, Get, Post, Put, Delete, Param, Body, HttpStatus, HttpCode, Res, Query, UseGuards, HttpException, ParseUUIDPipe, Req } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { Response } from "express";
 import { AuthGuard } from "src/Auth/auth.guard";
@@ -22,6 +22,11 @@ export class UserController {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+  @Get('profile')
+  @UseGuards(AuthGuard)
+  getUserProfile(/*@Headers*/@Req() request: Request){
+    
   }
 
   @UseGuards(AuthGuard)

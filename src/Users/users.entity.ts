@@ -9,24 +9,26 @@ export class User {
     @Column({ length: 50, nullable: false })
     name: string;
 
-    @Column({ length: 50, unique: true, nullable: false })
+    @Column({ length: 80, unique: true, nullable: false })
     email: string;
 
-    @Column({ length: 20, nullable: false })
+    @Column({ length: 100, nullable: false }) // Longitud ajustada para la contraseña hasheada
     password: string;
 
-    @Column("bigint", { nullable: true })
-    phone: number;
+    @Column("varchar", { length: 25, nullable: true })
+    phone: string;
 
-    @Column({ length: 50, nullable: true })
+    @Column("varchar", { length: 50, nullable: true })
     country: string;
 
-    @Column("text", { nullable: true })
+    @Column("varchar", { length: 80, nullable: true })
     address: string;
 
-    @Column({ length: 50, nullable: true })
+    @Column("varchar", { length: 50, nullable: true })
     city: string;
 
     @OneToMany(() => Order, (order) => order.user)
     orders: Order[];
 }
+
+

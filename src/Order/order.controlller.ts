@@ -1,11 +1,13 @@
-import { Controller, Get, Post, Param, Body, HttpStatus, Res, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, HttpStatus, Res, NotFoundException, UseGuards } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { Response } from 'express';
+import { AuthGuard } from 'src/Auth/auth.guard';
 
 @Controller('orders')
 export class OrderController {
     constructor(private readonly orderService: OrderService) {}
 
+    @UseGuards(AuthGuard) // Proteger el endpoint con AuthGuard
     @Post()
     async addOrder(
         @Body() orderData: { userId: string; products: { id: string }[] },
@@ -23,6 +25,7 @@ export class OrderController {
         }
     }
 
+    @UseGuards(AuthGuard) // Proteger el endpoint con AuthGuard
     @Get(':id')
     async getOrder(@Param('id') orderId: string, @Res() res: Response) {
         try {
@@ -36,4 +39,5 @@ export class OrderController {
         }
     }
 }
+
 

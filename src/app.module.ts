@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import typeOrmConfig from "./config/typeorm";
 import { CategoryModule } from './Category/category.module';
 import { FilesModule } from './Cloudinary/files.module'; // Ajuste de la ruta
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
     imports: [
@@ -23,6 +24,11 @@ import { FilesModule } from './Cloudinary/files.module'; // Ajuste de la ruta
         ProductModule,
         CategoryModule,
         FilesModule,
+        JwtModule.register({
+            global:true,
+            signOptions:{expiresIn:'1h'},
+            secret:process.env.JWT_SECRET,
+        })
     ]
 })
 export class AppModule {}
