@@ -10,7 +10,7 @@ export class ProductRepository {
         private readonly productRepo: Repository<Product>,
     ) {}
 
-    getProducts(page: number, limit: number): Promise<Product[]> {
+    getProducts(page: number=1, limit: number=5): Promise<Product[]> {
         const skip = (page - 1) * limit;
         return this.productRepo.find({
             skip,

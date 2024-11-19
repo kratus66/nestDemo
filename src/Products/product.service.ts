@@ -27,7 +27,7 @@ export class ProductService {
         return newProducts;
     }
 
-    async getProducts(page: number, limit: number): Promise<Product[]> {
+    async getProducts(page: number=1, limit: number=5): Promise<Product[]> {
         return this.productRepository.getProducts(page, limit);
     }
 

@@ -24,9 +24,11 @@ export class UserRepository {
             relations: ["orders"],
         });
     }
-    async findByEmail(email: string): Promise<User | null> { // Agrega este método
+
+    async findByEmail(email: string): Promise<User | null> { 
         return this.userRepo.findOne({ where: { email } });
     }
+
     async createUser(userData: Partial<User>): Promise<User> {
         const newUser = this.userRepo.create(userData);
         return this.userRepo.save(newUser);
@@ -40,4 +42,6 @@ export class UserRepository {
     async deleteUser(id: string): Promise<void> {
         await this.userRepo.delete(id);
     }
+
+   
 }

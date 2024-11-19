@@ -1,32 +1,38 @@
-import { Body, Controller, Post, HttpCode, HttpStatus, BadRequestException, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { LoginUserDto } from '../Dto/LoginUserDto';
-import { RegisterUserDto } from '../Dto/RegisterUserDto';
+import { Body, Controller, HttpStatus, Post,Res } from "@nestjs/common";
+import { UserRepository } from "src/Users/users.repository";
+import { Response } from "express";
+import { AuthService } from "src/Users/auth.service";
+import { UsersService } from "src/Users/users.service";
 
 @Controller('auth')
-export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+export class AuthController{
+    constructor(private readonly authService: AuthService){
 
-  @Post('signin')
-  @HttpCode(HttpStatus.OK)
-  async signIn(@Body() loginUserDto: LoginUserDto): Promise<{ message: string; token: string }> {
-    try {
-      const authResponse = await this.authService.signIn(loginUserDto.email, loginUserDto.password);
-      return { message: authResponse.success, token: authResponse.token };
-    } catch (error) {
-      throw new UnauthorizedException('Credenciales incorrectas');
-    }
-  }
-
-  @Post('signup')
-  async signUp(@Body() registerUserDto: RegisterUserDto) {
-    if (registerUserDto.password !== registerUserDto.confirmPassword) {
-      throw new BadRequestException('Las contraseñas no coinciden');
     }
 
-    const user = await this.authService.signUp(registerUserDto);
-    const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
-  }
+    @Post('signin')
+    async signin(
+        @Body('email') email:string,
+        @Body('password') password:string,
+        @Res() res:Response
+    ){
+        if(!email || ! password){
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                messaje:"Email o password no ingresados"
+            })
+        }
+        const isValidUser = await this.authService.validateUser(email,password)
+            if(!isValidUser){
+            return res.status(HttpStatus.UNAUTHORIZED).json({
+                messaje:"Email o password invalidos",
+            })
+            
+        }
+        const token = await this.authService.generateJwtToken(isValidUser);
+        return res.status(HttpStatus.OK).json({ token });
+    }
+
+
+
 }
 

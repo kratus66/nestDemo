@@ -16,14 +16,19 @@ export class CategoryRepository {
 
     async addCategories(categories: Category[]): Promise<Category[]> {
         const existingCategories = await this.categoryRepository.find();
-        const filteredCategories = categories.filter(
-            (category) =>
+        
+        // Filtramos las categorías que ya existen
+        const newCategories = categories.filter(
+            (category) => 
                 !existingCategories.some(
-                    (existingCategory) => existingCategory.name === category.name,
+                    (existingCategory) => existingCategory.name === category.name
                 ),
         );
-        return await this.categoryRepository.save(filteredCategories);
+
+        // Guardamos solo las categorías nuevas
+        return await this.categoryRepository.save(newCategories);
     }
+
     async findByName(name: string): Promise<Category | null> {
         return await this.categoryRepository.findOne({ where: { name } });
     }

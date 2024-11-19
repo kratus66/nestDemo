@@ -1,36 +1,30 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
+    async canActivate(context: ExecutionContext): Promise<boolean> {
+        const request: Request = context.switchToHttp().getRequest();
+        const authHeader = request.headers['authorization'];
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request: Request = context.switchToHttp().getRequest();
-    const authHeader = request.headers['authorization'];
+        // Verificar que el encabezado Authorization esté presente
+        if (!authHeader) {
+            throw new UnauthorizedException('Authorization header is missing');
+        }
 
-    // Verificamos que el token esté presente
-    if (!authHeader) {
-        throw new UnauthorizedException('Authorization header is missing');
-    }
+        // Verificar que el encabezado Authorization siga el formato "Basic: <email>:<password>"
+        const [scheme, credentials] = authHeader.split(' ');
+        if (scheme !== 'Basic' || !credentials) {
+            throw new UnauthorizedException('Authorization header format is invalid');
+        }
 
-    const [scheme, token] = authHeader.split(' ');
-    if (scheme !== 'Bearer' || !token) {
-        throw new UnauthorizedException('Authorization header format is invalid');
-    }
+        // Verificar que las credenciales contengan un email y una contraseña
+        const [email, password] = credentials.split(':');
+        if (!email || !password) {
+            throw new UnauthorizedException('Authorization header must contain email and password');
+        }
 
-    try {
-        // Verificamos el token usando el secreto del JWT
-        const payload = await this.jwtService.verifyAsync(token, { secret: process.env.JWT_SECRET });
-
-        // Incluimos la fecha de expiración en el request
-        (request as any).user = { ...payload, exp: new Date(payload.exp * 1000) };
+        // En este punto, el header Authorization tiene el formato correcto "Basic: <email>:<password>"
         return true;
-    } catch (error) {
-        throw new UnauthorizedException('Invalid token');
     }
 }
-}
-
-

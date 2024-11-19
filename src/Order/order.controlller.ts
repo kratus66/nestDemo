@@ -13,8 +13,8 @@ export class OrderController {
         @Body() orderData: { userId: string; products: { id: string }[] },
         @Res() res: Response,
     ) {
-        const productIds = orderData.products.map((product) => product.id);
         try {
+            const productIds = orderData.products.map((product) => product.id);
             const order = await this.orderService.addOrder(orderData.userId, productIds);
             return res.status(HttpStatus.CREATED).json(order);
         } catch (error) {
@@ -39,5 +39,6 @@ export class OrderController {
         }
     }
 }
+
 
 
