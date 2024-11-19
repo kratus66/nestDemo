@@ -36,7 +36,7 @@ export class OrderRepository {
                 stock: MoreThan(0),
             },
         });
-        
+
         if (products.length === 0) {
             throw new NotFoundException(`No products available for purchase`);
         }
@@ -61,9 +61,10 @@ export class OrderRepository {
     async findOrderById(orderId: string): Promise<Order | null> {
         return await this.orderRepo.findOne({
             where: { id: orderId },
-            relations: ["user", "orderDetails", "orderDetails.products"],
+            relations: ['user', 'orderDetails', 'orderDetails.products'],
         });
     }
 }
+
 
 

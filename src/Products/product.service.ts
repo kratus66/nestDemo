@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ProductRepository } from "./product.repository";
 import { CategoryRepository } from "../Category/category.repository";
 import { Product } from "./product.entity";
-import productData from "../data/products.json";
+import * as productData from '../data/products.json';
 
 @Injectable()
 export class ProductService {
@@ -12,18 +12,24 @@ export class ProductService {
     ) {}
 
     async seedProducts() {
+        if (!productData || !Array.isArray(productData)) {
+            throw new Error('Product data is not loaded or is invalid.');
+        }
+    
         const existingProducts = await this.productRepository.findAll();
         const newProducts = productData.filter(
             (newProduct) => !existingProducts.some((prod) => prod.name === newProduct.name)
         );
-
+    
         for (const product of newProducts) {
             const category = await this.categoryRepository.findByName(product.category);
             if (category) {
-                const stockValue = typeof product.stock === 'boolean' ? (product.stock ? 1 : 0) : product.stock;
+                const stockValue =
+                    typeof product.stock === 'boolean' ? (product.stock ? 1 : 0) : product.stock;
                 await this.createProduct({ ...product, stock: stockValue, category: category.name });
             }
         }
+    
         return newProducts;
     }
 

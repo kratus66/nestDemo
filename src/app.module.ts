@@ -8,6 +8,7 @@ import typeOrmConfig from "./config/typeorm";
 import { CategoryModule } from './Category/category.module';
 import { FilesModule } from './Cloudinary/files.module'; // Ajuste de la ruta
 import { JwtModule } from '@nestjs/jwt';
+import { OrderModule } from './Order/order.module';
 
 @Module({
     imports: [
@@ -20,6 +21,7 @@ import { JwtModule } from '@nestjs/jwt';
             useFactory: (configService: ConfigService) => configService.get("typeorm"),
         }),
         AuthModule,
+        OrderModule,
         UserModule,
         ProductModule,
         CategoryModule,

@@ -1,18 +1,17 @@
 [
     {
-        "name": "Smartphone",
-        "description": "A powerful smartphone",
-        "price": 699.99,
-        "stock": 50,
-        "imgUrl": "smartphone.jpg",
-        "category": "Electronics"
+        "name": "Laptop",
+        "description": "High performance laptop",
+        "price": 1200.99,
+        "stock": 10,
+        "category": "Electrónica"
     },
     {
-        "name": "Laptop",
-        "description": "High-performance laptop",
-        "price": 1299.99,
-        "stock": 30,
-        "imgUrl": "laptop.jpg",
-        "category": "Electronics"
+        "name": "Book",
+        "description": "Educational book",
+        "price": 19.99,
+        "stock": 50,
+        "category": "Libros"
     }
 ]
+

@@ -20,3 +20,4 @@ export class Order {
     @Column("decimal", { precision: 10, scale: 2, nullable: false, default: 0 })
     totalAmount: number; // Almacena el monto total de la orden
 }
+
