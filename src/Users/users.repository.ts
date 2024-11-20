@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "./users.entity";
@@ -19,10 +19,26 @@ export class UserRepository {
     }
 
     async findByIdWithOrders(id: string): Promise<User> {
-        return this.userRepo.findOne({
+        // Buscar el usuario por ID e incluir las órdenes con solo los campos necesarios
+        const user = await this.userRepo.findOne({
             where: { id },
-            relations: ["orders"],
+            relations: ["orders"], // Cargar las órdenes relacionadas
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                orders: {
+                    id: true,
+                    date: true,
+                },
+            },
         });
+
+        if (!user) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+
+        return user;
     }
 
     async findByEmail(email: string): Promise<User | null> { 
@@ -42,6 +58,5 @@ export class UserRepository {
     async deleteUser(id: string): Promise<void> {
         await this.userRepo.delete(id);
     }
-
-   
 }
+

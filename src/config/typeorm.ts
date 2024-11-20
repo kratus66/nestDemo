@@ -10,7 +10,7 @@ import { Category } from '../Category/category.entity';
 dotenvConfig({ path: ".env.development" }); // Cargar variables desde el archivo .env
 console.log(`Database: ${process.env.DB_NAME}`);
 
-const config: DataSourceOptions = {
+export const config: DataSourceOptions = {
     type: "postgres",
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,

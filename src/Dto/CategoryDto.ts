@@ -11,5 +11,5 @@ export class CategoryDto {
 
     @IsString()
     @Length(2,50)
-    products: string;
+    products: string[];
 }
