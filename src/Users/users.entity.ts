@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { Order } from "../Order/order.entity";
+import { Role } from "../constants/roles.enum";
 
 @Entity({ name: "users" })
 export class User {
@@ -12,13 +13,13 @@ export class User {
     @Column({ length: 50, unique: true, nullable: false })
     email: string;
 
-    @Column({ length: 20, nullable: false }) 
+    @Column({ length: 255, nullable: false }) 
     password: string;
 
-    @Column( )
+    @Column()
     phone: number;
 
-    @Column("varchar", { length: 50})
+    @Column("varchar", { length: 50 })
     country: string;
 
     @Column("varchar", { length: 80, nullable: true })
@@ -26,6 +27,13 @@ export class User {
 
     @Column("varchar", { length: 50, nullable: true })
     city: string;
+
+    @Column({
+        type: 'enum',
+        enum: Role,
+        default: Role.USER, // Por defecto, los usuarios serán de tipo 'user'
+      })
+      role: Role;
 
     @OneToMany(() => Order, (order) => order.user)
     orders: Order[];

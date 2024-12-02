@@ -3,7 +3,11 @@ import { ProductService } from "./product.service";
 import { Product } from "../Interfaces/Product";
 import { Response } from "express";
 import { AuthGuard } from "src/Auth/auth.guard";
+import { Role } from "src/constants/roles.enum";
+import { Roles } from "src/decorators/roles.decorator";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('Products')
 @Controller("products")
 export class ProductController {
     constructor(private readonly productService: ProductService) {}
@@ -38,6 +42,7 @@ export class ProductController {
     }
 
     @UseGuards(AuthGuard)
+    @Roles(Role.ADMIN)
     @Put(':id')
     async updateProduct(@Param('id') id: string, @Body() product: Partial<Product> & { category?: string }, @Res() res: Response) {
         const stockValue = typeof product.stock === 'boolean' ? (product.stock ? 1 : 0) : product.stock;

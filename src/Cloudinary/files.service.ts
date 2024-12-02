@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestj
 import { CloudinaryRepository } from './cloudinary.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Product } from '../products/product.entity';
+import { Product } from '../Products/product.entity';
 
 @Injectable()
 export class FilesService {

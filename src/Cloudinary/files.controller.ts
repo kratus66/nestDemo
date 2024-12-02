@@ -2,7 +2,10 @@ import { Controller, Post, Delete, UploadedFile, Param, UseInterceptors, HttpExc
 import { FilesService } from './files.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from 'src/Auth/auth.guard';
+import { ImageValidationPipe } from './image-validation.pipe';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Files')
 @Controller('files')
 export class FilesController {
     constructor(private readonly filesService: FilesService) {}
@@ -12,7 +15,7 @@ export class FilesController {
     @UseInterceptors(FileInterceptor('file'))
     async uploadImage(
         @Param('id', ParseUUIDPipe) id: string, // ParseUUIDPipe si los IDs son UUIDs
-        @UploadedFile() file: Express.Multer.File,
+        @UploadedFile(ImageValidationPipe) file: Express.Multer.File,
     ) {
         if (!file) {
             throw new HttpException('Archivo no recibido', HttpStatus.BAD_REQUEST);

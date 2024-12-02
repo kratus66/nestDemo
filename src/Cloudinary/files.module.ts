@@ -3,8 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FilesService } from './files.service';
 import { FilesController } from './files.controller';
 import { cloudinaryConfig } from '../config/cloudinary';
-import { Product } from '../products/product.entity';
-import { ProductModule } from '../products/products.module';
+import { Product } from '../Products/product.entity';
+import { ProductModule } from '../Products/products.module';
 import { CloudinaryRepository } from './cloudinary.repository';
 
 @Module({

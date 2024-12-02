@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecommerce-app
+    ports:
+      - "3001:3001" # Mapea el puerto 3001 del contenedor al 3001 del host
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=demo-db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=Colombia123
+      - JWT_SECRET=Colombia123
+    depends_on:
+      - postgres # Define la dependencia con el servicio de la base de datos
+    command: npm run start # Cambia este comando según cómo inicias tu app
+
+  postgres:
+    image: postgres:15
+    container_name: ecommerce-db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Colombia123
+      POSTGRES_DB: demo-db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
+    driver: local

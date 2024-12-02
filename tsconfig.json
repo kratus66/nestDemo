@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "paths": {"src/*":["src/*"]},
     "typeRoots": ["./node_modules/@types", "./types"],
         "types": ["node", "express","multer"],
         "module": "commonjs",

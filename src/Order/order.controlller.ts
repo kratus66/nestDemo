@@ -1,11 +1,15 @@
-import { Controller, Get, Post, Param, Body, HttpStatus, Res } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, HttpStatus, Res,UseGuards } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { Response } from 'express';
+import { AuthGuard } from 'src/Auth/auth.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+
+@ApiTags('Orders')
 @Controller('orders')
 export class OrderController {
     constructor(private readonly orderService: OrderService) {}
-
+    @UseGuards(AuthGuard)
     @Post()
     async addOrder(
         @Body() orderData: { userId: string; products: { id: string }[] },
@@ -20,7 +24,7 @@ export class OrderController {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
         }
     }
-
+    @UseGuards(AuthGuard)
     @Get(':id')
     async getOrder(@Param('id') orderId: string, @Res() res: Response) {
         try {
