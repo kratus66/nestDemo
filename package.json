@@ -7,12 +7,18 @@
     "test": "test"
   },
   "scripts": {
-  "build": "nest build",
-  "start": "nest start",
-  "start:dev": "nest start --watch",
-  "start:debug": "nest start --debug --watch",
-  "start:prod": "node dist/main"
-},
+    "build": "nest build",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli",
+    "migration:generate": "npm run typeorm -- -d ./src/config/typeorm.ts migration:generate dist/migrations/MigrationName",
+    "migration:run": "npm run typeorm -- -d ./src/config/typeorm.ts migration:run",
+    "migration:revert": "npm run typeorm -- -d ./src/config/typeorm.ts migration:revert",
+    "migration:create": "npm run typeorm -- migration:create dist/migrations/MigrationName",
+    "migration:show": "npm run typeorm -- -d ./src/config/typeorm.ts migration:show"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
