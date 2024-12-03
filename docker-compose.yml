@@ -9,7 +9,7 @@ services:
     ports:
       - "3001:3001" # Mapea el puerto 3001 del contenedor al 3001 del host
     environment:
-      - DB_HOST=postgres
+      - DB_HOST=ecommerce-db
       - DB_PORT=5432
       - DB_NAME=demo-db
       - DB_USERNAME=postgres
