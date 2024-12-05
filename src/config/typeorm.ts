@@ -7,14 +7,14 @@ import { OrderDetails } from '../Order/orderDetails.entity';
 import { Product } from '../Products/product.entity';
 import { Category } from '../Category/category.entity';
 
-dotenvConfig({ path: ".env.development" }); // Cargar variables desde el archivo .env
+dotenvConfig({ path: ".env" }); // Cargar variables desde el archivo .env
 console.log(`Database: ${process.env.DB_NAME}`);
 
 export const config: DataSourceOptions = {
     type: "postgres",
     database: process.env.DB_NAME,
-    host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT, 10) || 5432,
+    host: process.env.DB_HOST || 'localhost' ,
+    port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 5432,
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     entities: [User, Order, OrderDetails, Product, Category],

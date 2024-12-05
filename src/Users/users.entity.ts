@@ -8,35 +8,36 @@ export class User {
     id: string;
 
     @Column({ length: 50, nullable: false })
-    name: string;
+    name: string = '';
 
     @Column({ length: 50, unique: true, nullable: false })
-    email: string;
+    email: string = '';
 
-    @Column({ length: 255, nullable: false }) 
-    password: string;
+    @Column({ length: 255, nullable: false })
+    password: string = '';
 
-    @Column()
-    phone: number;
+    @Column({ type: "bigint", nullable: true })
+    phone?: number;
 
-    @Column("varchar", { length: 50 })
-    country: string;
-
-    @Column("varchar", { length: 80, nullable: true })
-    address: string;
 
     @Column("varchar", { length: 50, nullable: true })
-    city: string;
+    country?: string;
+
+    @Column("varchar", { length: 80, nullable: true })
+    address?: string;
+
+    @Column("varchar", { length: 50, nullable: true })
+    city?: string;
 
     @Column({
         type: 'enum',
         enum: Role,
-        default: Role.USER, // Por defecto, los usuarios serán de tipo 'user'
-      })
-      role: Role;
+        default: Role.USER,
+    })
+    role: Role = Role.USER;
 
     @OneToMany(() => Order, (order) => order.user)
-    orders: Order[];
+    orders: Order[] ;
 }
 
 

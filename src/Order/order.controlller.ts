@@ -3,21 +3,28 @@ import { OrderService } from './order.service';
 import { Response } from 'express';
 import { AuthGuard } from 'src/Auth/auth.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateOrderDto } from 'src/Dto/CreateOrderDto';
+import { UsePipes, ValidationPipe } from '@nestjs/common';
+
 
 @ApiTags('Orders')
 @Controller('orders')
 export class OrderController {
     constructor(private readonly orderService: OrderService) {}
 
-    @UseGuards(AuthGuard)
+    /* @UseGuards(AuthGuard) */
     @Post()
+    @UsePipes(ValidationPipe)
     async addOrder(
-        @Body() orderData: { userId: string; products: { id: string }[] },
+        @Body() orderData: CreateOrderDto,
         @Res() res: Response
     ) {
         try {
+            console.log('Received Order Data:', orderData);
             const { userId, products } = orderData;
             const productIds = products.map((product) => product.id);
+            console.log('User ID:', userId, 'Product IDs:', productIds);
+    
             const order = await this.orderService.addOrder(userId, productIds);
             return res.status(HttpStatus.CREATED).json(order);
         } catch (error) {
@@ -26,7 +33,7 @@ export class OrderController {
         }
     }
 
-    @UseGuards(AuthGuard)
+    /* @UseGuards(AuthGuard) */
     @Get(':id')
     async getOrder(@Param('id') orderId: string, @Res() res: Response) {
         try {

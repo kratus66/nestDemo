@@ -4,7 +4,7 @@ import { v2 as cloudinary, UploadApiErrorResponse, UploadApiResponse } from 'clo
 
 @Injectable()
 export class CloudinaryRepository {
-    async uploadImage(file: Express.Multer.File): Promise<UploadApiResponse | UploadApiErrorResponse> {
+    async uploadImage(file: Express.Multer.File): Promise<UploadApiResponse> {
         return new Promise((resolve, reject) => {
             cloudinary.uploader.upload_stream(
                 {
@@ -12,8 +12,13 @@ export class CloudinaryRepository {
                     resource_type: 'image',
                 },
                 (error, result) => {
-                    if (error) return reject(error);
-                    resolve(result);
+                    if (error) {
+                        return reject(error); // Rechaza la promesa si hay un error
+                    }
+                    if (!result) {
+                        return reject(new Error('Upload result is undefined')); // Maneja el caso de un resultado undefined
+                    }
+                    resolve(result as UploadApiResponse); // Asegura que el resultado no sea undefined
                 },
             ).end(file.buffer);
         });
@@ -22,10 +27,16 @@ export class CloudinaryRepository {
     async deleteImage(publicId: string): Promise<{ result: string }> {
         return new Promise((resolve, reject) => {
             cloudinary.uploader.destroy(publicId, (error, result) => {
-                if (error) return reject(error);
-                resolve(result);
+                if (error) {
+                    return reject(error); // Rechaza la promesa si hay un error
+                }
+                if (!result) {
+                    return reject(new Error('Delete result is undefined')); // Maneja el caso de un resultado undefined
+                }
+                resolve(result as { result: string }); // Asegura que el resultado no sea undefined
             });
         });
     }
 }
+
 

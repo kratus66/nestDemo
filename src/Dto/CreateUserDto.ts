@@ -45,9 +45,9 @@ export class CreateUserDto {
 
     @IsString()
     @Length(3,80)
-    address: string;
+    address: string|null;
 
     @IsString()
     @Length(5,20)
-    city: string;
+    city: string|null;
 }

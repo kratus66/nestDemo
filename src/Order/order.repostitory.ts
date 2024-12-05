@@ -23,37 +23,34 @@ export class OrderRepository {
     ) {}
 
     async createOrder(userId: string, productIds: string[]): Promise<Order> {
-        // Buscar el usuario por ID
+        console.log('Repository - Creating order for User ID:', userId);
+        console.log('Repository - Product IDs:', productIds);
+    
+        if (!userId || !productIds || productIds.some(id => !id)) {
+            throw new Error('Invalid userId or productIds');
+        }
+    
         const user = await this.userRepo.findOne({ where: { id: userId } });
         if (!user) {
             throw new NotFoundException(`User with ID ${userId} not found`);
         }
-
-        // Buscar productos con stock disponible
+    
         const products = await this.productRepo.find({
             where: {
                 id: In(productIds),
                 stock: MoreThan(0),
             },
         });
-
+    
         if (products.length === 0) {
             throw new NotFoundException(`No products available for purchase`);
         }
-
-        // Calcular el precio total y reducir el stock
+    
         const totalPrice = products.reduce((sum, product) => sum + Number(product.price), 0);
-
-        for (const product of products) {
-            product.stock -= 1;
-            await this.productRepo.save(product);
-        }
-
-        // Crear el detalle de la orden
+    
         const orderDetails = this.orderDetailsRepo.create({ price: totalPrice, products });
         await this.orderDetailsRepo.save(orderDetails);
-
-        // Crear la orden
+    
         const order = this.orderRepo.create({ user, orderDetails, totalAmount: totalPrice });
         return await this.orderRepo.save(order);
     }

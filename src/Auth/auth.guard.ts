@@ -5,6 +5,8 @@ import { Request } from 'express';
 import { Role } from '../constants/roles.enum';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
+
+
 @Injectable()
 export class AuthGuard implements CanActivate {
     constructor(private readonly jwtService: JwtService, private readonly reflector: Reflector) {}
@@ -17,6 +19,7 @@ export class AuthGuard implements CanActivate {
         if (!authHeader) {
             throw new UnauthorizedException('Authorization header is missing');
         }
+        
 
         const [scheme, token] = authHeader.split(' ');
         if (scheme !== 'Bearer' || !token) {

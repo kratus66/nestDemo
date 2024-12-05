@@ -7,9 +7,11 @@ import { User } from '../Users/users.entity';
 import { OrderService } from './order.service';
 import { OrderController } from './order.controlller';
 import { OrderRepository } from './order.repostitory';
+import { AuthModule } from 'src/Auth/auth.module';
+
 
 @Module({
-    imports: [
+    imports: [AuthModule,
         TypeOrmModule.forFeature([Order, OrderDetails, Product, User]),
     ],
     providers: [OrderService, OrderRepository],

@@ -17,13 +17,14 @@ services:
       - JWT_SECRET=Colombia123
     depends_on:
       - postgres # Define la dependencia con el servicio de la base de datos
-    command: npm run start # Cambia este comando según cómo inicias tu app
+    command: npm run start:prod # Comando para iniciar en producción
+    restart: unless-stopped # Asegura que el contenedor se reinicie si falla
 
   postgres:
     image: postgres:15
     container_name: ecommerce-db
     ports:
-      - "5433:5432"
+      - "5433:5432" # Puerto mapeado para acceso local
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: Colombia123
@@ -34,3 +35,4 @@ services:
 volumes:
   postgres-data:
     driver: local
+

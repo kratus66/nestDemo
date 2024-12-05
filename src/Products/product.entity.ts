@@ -5,22 +5,22 @@ import { OrderDetails } from "../Order/orderDetails.entity";
 @Entity({ name: "products" })
 export class Product {
     @PrimaryGeneratedColumn("uuid")
-    id: string;
+    id: string = '';
 
     @Column({ length: 50, nullable: false })
-    name: string;
+    name: string = '';
 
     @Column("text", { nullable: false })
-    description: string;
+    description: string = '';
 
     @Column("decimal", { precision: 10, scale: 2, nullable: false })
-    price: number;
+    price: number = 0;
 
     @Column("int", { nullable: false })
-    stock: number;
+    stock: number = 0;
 
     @Column({ default: "default-image.jpg" })
-    imgUrl: string;
+    imgUrl: string = 'default-image.jpg';
 
     @ManyToOne(() => Category, (category) => category.products)
     category: Category;

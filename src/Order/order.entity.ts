@@ -5,19 +5,19 @@ import { OrderDetails } from "./orderDetails.entity";
 @Entity({ name: "orders" })
 export class Order {
     @PrimaryGeneratedColumn("uuid")
-    id: string;
+    id: string ;
 
     @ManyToOne(() => User, (user) => user.orders)
     user: User;
 
     @Column("timestamp", { default: () => "CURRENT_TIMESTAMP" })
-    date: Date;
+    date:Date= new Date();
 
     @OneToOne(() => OrderDetails, { cascade: true })
     @JoinColumn()
     orderDetails: OrderDetails;
 
     @Column("decimal", { precision: 10, scale: 2, nullable: false, default: 0 })
-    totalAmount: number; // Almacena el monto total de la orden
+    totalAmount: number=0; // Almacena el monto total de la orden
 }
 

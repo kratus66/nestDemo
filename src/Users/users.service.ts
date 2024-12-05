@@ -29,10 +29,10 @@ export class UsersService {
         newUser.name = createUserDto.name;
         newUser.email = createUserDto.email;
         newUser.password = createUserDto.password; // Asegúrate de manejar el hashing en algún lugar si es necesario
-        newUser.phone = createUserDto.phone || null; // Si el campo es opcional
-        newUser.country = createUserDto.country || null;
-        newUser.address = createUserDto.address || null;
-        newUser.city = createUserDto.city || null;
+        newUser.phone = createUserDto.phone ?? 0;// Si el campo es opcional
+        newUser.country = createUserDto.country ?? 'Desconocido';
+        newUser.address = createUserDto.address || undefined;
+        newUser.city = createUserDto.city || undefined;
 
         return this.userRepository.createUser(newUser);
     }

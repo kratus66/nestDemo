@@ -57,6 +57,7 @@ export class ProductService {
     async updateProduct(id: string, productData: Partial<Omit<Product, 'id' | 'category'>> & { category?: string }): Promise<Product | null> {
         const category = productData.category ? await this.categoryRepository.findByName(productData.category) : undefined;
         const stockValue = typeof productData.stock === 'boolean' ? (productData.stock ? 1 : 0) : productData.stock;
-        return this.productRepository.updateProduct(id, { ...productData, stock: stockValue, category });
+        const validCategory = category || undefined; // Convierte null a undefined
+        return this.productRepository.updateProduct(id, { ...productData, stock: stockValue, category: validCategory });
     }
 }

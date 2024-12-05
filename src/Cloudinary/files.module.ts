@@ -6,9 +6,11 @@ import { cloudinaryConfig } from '../config/cloudinary';
 import { Product } from '../Products/product.entity';
 import { ProductModule } from '../Products/products.module';
 import { CloudinaryRepository } from './cloudinary.repository';
+import { AuthModule } from 'src/Auth/auth.module';
 
 @Module({
     imports: [
+        AuthModule,
         ProductModule,
         TypeOrmModule.forFeature([Product]) // Asegura que Product esté disponible para TypeORM
     ],
