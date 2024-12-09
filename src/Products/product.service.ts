@@ -1,63 +1,94 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { ProductRepository } from "./product.repository";
 import { CategoryRepository } from "../Category/category.repository";
 import { Product } from "./product.entity";
-import * as productData from '../data/products.json';
+import { CreateProductDto } from "../Dto/CreateProductDto";
+import { UpdateProductDto } from "../Dto/UpdateProductDto";
+import { Category } from "src/Category/category.entity";
 
 @Injectable()
 export class ProductService {
     constructor(
-        private readonly productRepository: ProductRepository,  // Inyecta ProductRepository en lugar de Repository<Product>
-        private categoryRepository: CategoryRepository,
+        private readonly productRepository: ProductRepository,
+        private readonly categoryRepository: CategoryRepository,
     ) {}
 
     async seedProducts() {
+        const productData = await import("../data/products.json");
         if (!productData || !Array.isArray(productData)) {
-            throw new Error('Product data is not loaded or is invalid.');
+            throw new BadRequestException("Product data is not loaded or is invalid.");
         }
-    
+
         const existingProducts = await this.productRepository.findAll();
         const newProducts = productData.filter(
             (newProduct) => !existingProducts.some((prod) => prod.name === newProduct.name)
         );
-    
+
         for (const product of newProducts) {
             const category = await this.categoryRepository.findByName(product.category);
             if (category) {
-                const stockValue =
-                    typeof product.stock === 'boolean' ? (product.stock ? 1 : 0) : product.stock;
-                await this.createProduct({ ...product, stock: stockValue, category: category.name });
+                await this.createProduct({ ...product, category: category.name });
             }
         }
-    
+
         return newProducts;
     }
 
-    async getProducts(page: number=1, limit: number=5): Promise<Product[]> {
+    async getProducts(page = 1, limit = 5): Promise<Product[]> {
         return this.productRepository.getProducts(page, limit);
     }
 
-    async getProductById(id: string): Promise<Product | null> {
-        return this.productRepository.getProductById(id);
+    async getProductById(id: string): Promise<Product> {
+        const product = await this.productRepository.getProductById(id);
+        if (!product) {
+            throw new NotFoundException(`Product with ID ${id} not found.`);
+        }
+        return product;
     }
 
     async deleteProduct(id: string): Promise<void> {
+        const product = await this.getProductById(id); // Verifica que el producto exista
+        if (!product) {
+            throw new NotFoundException(`Product with ID ${id} not found.`);
+        }
         await this.productRepository.deleteProduct(id);
     }
 
-    async createProduct(productData: Partial<Omit<Product, 'id' | 'category'>> & { category: string }): Promise<Product> {
+    async createProduct(productData: CreateProductDto): Promise<Product> {
         const category = await this.categoryRepository.findByName(productData.category);
         if (!category) {
-            throw new Error(`Category with name ${productData.category} not found`);
+            throw new NotFoundException(`Category with name "${productData.category}" not found.`);
         }
-        const stockValue = typeof productData.stock === 'boolean' ? (productData.stock ? 1 : 0) : productData.stock;
-        return this.productRepository.createProduct({ ...productData, stock: stockValue, category });
+
+        return this.productRepository.createProduct({
+            ...productData,
+            stock: productData.stock,
+            category,
+        });
     }
 
-    async updateProduct(id: string, productData: Partial<Omit<Product, 'id' | 'category'>> & { category?: string }): Promise<Product | null> {
-        const category = productData.category ? await this.categoryRepository.findByName(productData.category) : undefined;
-        const stockValue = typeof productData.stock === 'boolean' ? (productData.stock ? 1 : 0) : productData.stock;
-        const validCategory = category || undefined; // Convierte null a undefined
-        return this.productRepository.updateProduct(id, { ...productData, stock: stockValue, category: validCategory });
+    async updateProduct(id: string, productData: UpdateProductDto): Promise<Product> {
+        const product = await this.getProductById(id); // Verifica que el producto exista
+        if (!product) {
+            throw new NotFoundException(`Product with ID ${id} not found.`);
+        }
+    
+        let categoryEntity: Category | undefined;
+    
+        // Si se incluye una categoría, conviértela al tipo correcto
+        if (productData.category) {
+            const category = await this.categoryRepository.findByName(productData.category);
+            if (!category) {
+                throw new NotFoundException(`Category with name "${productData.category}" not found.`);
+            }
+            categoryEntity = category;
+        }
+    
+        // Pasa los datos actualizados al repositorio, asegurando el tipo correcto de category
+        return this.productRepository.updateProduct(id, {
+            ...productData,
+            category: categoryEntity, // Cambia la categoría si se especifica
+        });
     }
+    
 }

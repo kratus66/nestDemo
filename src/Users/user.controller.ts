@@ -21,31 +21,33 @@ import { CreateUserDto } from '../Dto/CreateUserDto';
 import { UpdateUserDto } from '../Dto/Update-userDto';
 import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../constants/roles.enum';
-import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiQuery} from '@nestjs/swagger';
 
 @ApiTags('users')
 @Controller('users')
 export class UserController {
     constructor(private readonly usersService: UsersService) {}
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard)
-    @Roles(Role.ADMIN)
-    @Get()
-    @ApiOperation({ summary: 'Obtener lista de usuarios' })
-    async getUsers(
-        @Res() res: Response,
-        @Query('page') page = 1,
-        @Query('limit') limit = 5
-    ) {
-        try {
-            const users = await this.usersService.getUsers(page, limit);
-            return res.status(HttpStatus.OK).json(users);
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Error al obtener los usuarios';
-            throw new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+@ApiBearerAuth()
+@UseGuards(AuthGuard)
+@Roles(Role.ADMIN)
+@Get()
+@ApiOperation({ summary: 'Obtener lista de usuarios' })
+@ApiQuery({ name: 'page', required: false, description: 'Número de página', example: 1 })
+@ApiQuery({ name: 'limit', required: false, description: 'Cantidad de usuarios por página', example: 5 })
+async getUsers(
+    @Res() res: Response,
+    @Query('page') page = 1,
+    @Query('limit') limit = 5
+) {
+    try {
+        const users = await this.usersService.getUsers(page, limit);
+        return res.status(HttpStatus.OK).json(users);
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Error al obtener los usuarios';
+        throw new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+}
 
     @ApiBearerAuth()
     @UseGuards(AuthGuard)

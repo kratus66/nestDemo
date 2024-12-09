@@ -1,27 +1,27 @@
-# Usa una imagen oficial de Node.js como base
+# Usa una imagen base de Node.js
 FROM node:18
 
-# Establece el directorio de trabajo dentro del contenedor
+# Establece el directorio de trabajo
 WORKDIR /usr/src/app
 
-# Copia los archivos necesarios para instalar dependencias
-COPY package*.json tsconfig.json ./
+# Copia los archivos de configuración y dependencias
+COPY package*.json ./
 
-# Instala las dependencias dentro del contenedor
+# Instala TODAS las dependencias, incluidas las de desarrollo
 RUN npm install
+
+# Instala @nestjs/cli globalmente
+RUN npm install -g @nestjs/cli
 
 # Copia el resto del código fuente
 COPY . .
 
-# Compila el proyecto TypeScript
+# Construye la aplicación NestJS
 RUN npm run build
 
-# Elimina dependencias innecesarias tras compilar (opcional para reducir tamaño)
-RUN npm prune --production
-
-# Expone el puerto en el que se ejecutará la aplicación
-EXPOSE 3001
-
-# Configura el comando de inicio
-CMD ["node", "dist/main"]
+# Elimina las dependencias de desarrollo para optimizar la imagen
+RUN npm prune --omit=dev
+EXPOSE 3000
+# Establece el comando de inicio en modo producción
+CMD ["npm", "run", "start:prod"]
 

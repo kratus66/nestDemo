@@ -16,7 +16,7 @@ export class User {
     @Column({ length: 255, nullable: false })
     password: string = '';
 
-    @Column({ type: "bigint", nullable: true })
+    @Column("bigint", { nullable: true })
     phone?: number;
 
 

@@ -58,8 +58,8 @@ export class AuthController {
             throw new HttpException("Passwords do not match", HttpStatus.BAD_REQUEST);
         }
 
-        const user = await this.authService.signup(registerUserDto);
-        const { password: _, ...userWithoutPassword } = user;
+        const userWithoutPassword = await this.authService.signup(registerUserDto);
+        
         return res.status(HttpStatus.CREATED).json(userWithoutPassword);
     }
 
