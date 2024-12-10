@@ -1,4 +1,23 @@
+version: '3.8'
+
 services:
+  postgres:
+    image: postgres:15
+    container_name: ecommerce-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Colombia123
+      POSTGRES_DB: demo-db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
   app:
     build:
       context: .
@@ -7,6 +26,7 @@ services:
     ports:
       - "3001:3001"
     environment:
+      - NODE_ENV=production
       - DB_HOST=ecommerce-db
       - DB_PORT=5432
       - DB_NAME=demo-db
@@ -14,23 +34,12 @@ services:
       - DB_PASSWORD=Colombia123
       - JWT_SECRET=Colombia123
     depends_on:
-      - postgres
-    command: npm run start:prod
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
-
-  postgres:
-    image: postgres:15
-    container_name: ecommerce-db
-    ports:
-      - "5433:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Colombia123
-      POSTGRES_DB: demo-db
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
+    command: >
+      sh -c "./wait-for-it.sh ecommerce-db:5432 -- npm run migration:run && npm run start:prod"
 
 volumes:
   postgres-data:
     driver: local
-

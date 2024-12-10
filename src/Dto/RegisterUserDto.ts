@@ -1,68 +1,79 @@
-import { IsString, IsEmail, MinLength, Matches, IsNumber, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  MinLength,
+  Matches,
+  IsNumber,
+  IsOptional,
+  IsEnum
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import {Role} from '../constants/roles.enum';
 
 export class RegisterUserDto {
   @IsString()
   @ApiProperty({
-    description:'el nombre debe de ser minimo de dos caracteres',
-    example:"Diego Herrera"
-})
+    description: 'El nombre debe de ser mínimo de dos caracteres',
+    example: 'Diego Herrera',
+  })
   name: string;
 
   @IsEmail()
   @ApiProperty({
-    description:'el email debe de ser valido',
-    example:"diegoherrera@hotmail.com"
-})
+    description: 'El email debe de ser válido',
+    example: 'diegoherrera@hotmail.com',
+  })
   email: string;
 
   @IsString()
   @MinLength(8)
   @ApiProperty({
-    description:'La contraseña debe de contener mayusculas, minisculas, numeros y un caracter',
-    example:"Diego123*"
-})
+    description: 'La contraseña debe de contener mayúsculas, minúsculas, números y un carácter especial',
+    example: 'Diego123*',
+  })
   password: string;
 
   @IsString()
   @MinLength(8)
   @IsOptional()
   @ApiProperty({
-    description:'La contraseña debe de contener mayusculas, minisculas, numeros y un caracter',
-    example:"Diego123*"
-})
+    description: 'Confirmación de contraseña',
+    example: 'Diego123*',
+  })
   confirmPassword?: string;
 
-  // Otros campos opcionales, como `phone`, `country`, etc.
   @IsString()
   @IsOptional()
   @ApiProperty({
-    description:'direccion',
-    example:"mz b casa 12 barrio el triangulo"
-})
+    description: 'Dirección',
+    example: 'Mz B Casa 12 Barrio El Triangulo',
+  })
   address?: string;
 
   @IsNumber()
   @IsOptional()
   @ApiProperty({
-    description:'celular',
-    example:1234567890
-})
-  phone?:number;
+    description: 'Número de celular',
+    example: 987654321,
+  })
+  phone?: number;
 
   @IsString()
   @IsOptional()
   @ApiProperty({
-    description:'ciudad',
-    example:"puerto carreño"
-})
+    description: 'Ciudad',
+    example: 'Puerto Carreño',
+  })
   city?: string;
 
   @IsString()
   @IsOptional()
   @ApiProperty({
-    description:'vichada',
-    example:"vichada"
-})
+    description: 'País',
+    example: 'Vichada',
+  })
   country?: string;
+
+ 
 }
+
