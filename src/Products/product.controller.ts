@@ -20,6 +20,7 @@ import { Role } from "src/constants/roles.enum";
 import { CreateProductDto } from "src/Dto/CreateProductDto";
 import { UpdateProductDto } from "src/Dto/UpdateProductDto";
 import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
+import products from "../data/products.json"
 
 @ApiTags("Products")
 @Controller("products")
@@ -61,17 +62,21 @@ export class ProductController {
 
     @Post("seeder")
     @ApiOperation({ summary: "Seed products data" })
-    async seedProducts(@Res() res: Response) {
-        try {
-            const result = await this.productService.seedProducts();
-            return res.status(HttpStatus.CREATED).json({
-                message: "Products seeded successfully",
-                result,
-            });
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Internal server error";
-            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: errorMessage });
-        }
+    @ApiBearerAuth()
+    async seedProducts(
+    @Body() products: CreateProductDto[],
+    @Res() res: Response
+    ) {
+    try {
+        const result = await this.productService.seedProducts(products);
+        return res.status(HttpStatus.CREATED).json({
+            message: "Products seeded successfully",
+            result,
+        });
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Internal server error";
+        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: errorMessage });
+    }
     }
 
    /*  @UseGuards(AuthGuard) */

@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15
     container_name: ecommerce-db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: Colombia123
@@ -37,9 +35,9 @@ services:
       postgres:
         condition: service_healthy
     restart: unless-stopped
-    command: >
-      sh -c "./wait-for-it.sh ecommerce-db:5432 -- npm run migration:run && npm run start:prod"
 
 volumes:
   postgres-data:
     driver: local
+
+

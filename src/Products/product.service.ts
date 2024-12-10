@@ -13,25 +13,31 @@ export class ProductService {
         private readonly categoryRepository: CategoryRepository,
     ) {}
 
-    async seedProducts() {
-        const productData = await import("../data/products.json");
-        if (!productData || !Array.isArray(productData)) {
-            throw new BadRequestException("Product data is not loaded or is invalid.");
+    async seedProducts(products: CreateProductDto[]) {
+        if (!products || !Array.isArray(products)) {
+            throw new BadRequestException("Invalid product data provided.");
         }
-
-        const existingProducts = await this.productRepository.findAll();
-        const newProducts = productData.filter(
-            (newProduct) => !existingProducts.some((prod) => prod.name === newProduct.name)
-        );
-
-        for (const product of newProducts) {
-            const category = await this.categoryRepository.findByName(product.category);
-            if (category) {
-                await this.createProduct({ ...product, category: category.name });
+    
+        const createdProducts = [];
+        for (const product of products) {
+            try {
+                const category = await this.categoryRepository.findByName(product.category);
+                if (!category) {
+                    console.warn(`Category "${product.category}" not found. Skipping product "${product.name}".`);
+                    continue;
+                }
+                const createdProduct = await this.createProduct({ ...product, category: category.name });
+                createdProducts.push(createdProduct);
+            } catch (err) {
+                if (err instanceof Error) {
+                    console.error(`Error creating product "${product.name}": ${err.message}`);
+                } else {
+                    console.error(`Unexpected error creating product "${product.name}": ${JSON.stringify(err)}`);
+                }
             }
         }
-
-        return newProducts;
+    
+        return createdProducts;
     }
 
     async getProducts(page = 1, limit = 5): Promise<Product[]> {
