@@ -1,38 +1,37 @@
 import { CanActivate, ExecutionContext, Injectable, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
+import { Role } from 'src/constants/roles.enum';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
     constructor(private readonly reflector: Reflector, private readonly jwtService: JwtService) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        const roles = this.reflector.get<string[]>('roles', context.getHandler());
+        const roles = this.reflector.getAllAndOverride<Role[]>('roles', [
+            context.getHandler(),
+            context.getClass()
+
+        ]);
+
         if (!roles || roles.length === 0) {
-            return true; // Si no se requiere rol, se permite el acceso
+            return true; // ✅ Si no se especifica un rol, permitir el acceso
         }
 
         const request = context.switchToHttp().getRequest();
-        const authHeader = request.headers['authorization'];
+        const user= request.user;
 
-        if (!authHeader) {
-            throw new ForbiddenException('Authorization header is missing');
-        }
+        const hashRole=()=>{
+            roles.some((role)=>user?.role?.includes(role));
+            const valid=user&&user.roles&&hashRole;
 
-        const [scheme, token] = authHeader.split(' ');
-        if (scheme !== 'Bearer' || !token) {
-            throw new ForbiddenException('Invalid authorization header format');
-        }
-
-        try {
-            const payload = await this.jwtService.verifyAsync(token, { secret: process.env.JWT_SECRET });
-            if (!roles.includes(payload.role)) {
-                throw new ForbiddenException('Access denied. Insufficient role');
+            if(!valid){
+                throw new ForbiddenException("you dont have permission ")
             }
-            return true;
-        } catch (error) {
-            throw new ForbiddenException('Access denied. Invalid token or role');
+        return valid;
+
         }
+
     }
 }
 

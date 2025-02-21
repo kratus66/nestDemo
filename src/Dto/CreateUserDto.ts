@@ -50,4 +50,6 @@ export class CreateUserDto {
     @IsString()
     @Length(5,20)
     city: string|null;
+
+   
 }

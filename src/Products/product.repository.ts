@@ -11,22 +11,24 @@ export class ProductRepository {
     ) {}
 
     getProducts(page: number=1, limit: number=5): Promise<Product[]> {
-        const skip = (page - 1) * limit;
-        return this.productRepo.find({
-            skip,
-            take: limit,
-        });
+        return this.productRepo.find({ skip: (page - 1) * limit, take: limit });
     }
 
     getProductById(id: string): Promise<Product | null> {
         return this.productRepo.findOne({ where: { id } });
     }
 
-    async createProduct(newProduct: Partial<Omit<Product, 'id'>>): Promise<Product> {
-        const product = this.productRepo.create(newProduct);
-        return await this.productRepo.save(product);
+    async createProduct(newProduct: Partial<Product>): Promise<Product> {
+        return await this.productRepo.save(this.productRepo.create(newProduct));
     }
 
+    async deleteProduct(id: string): Promise<void> {
+        await this.productRepo.delete(id);
+    }
+
+    async findByName(name: string): Promise<Product | null> {
+        return this.productRepo.findOne({ where: { name } });
+    }
     async updateProduct(id: string, updateData: Partial<Product>): Promise<Product> {
         await this.productRepo.update(id, updateData);
         const updatedProduct = await this.getProductById(id);
@@ -37,13 +39,6 @@ export class ProductRepository {
     
         return updatedProduct;
     }
-
-    async deleteProduct(id: string): Promise<void> {
-        await this.productRepo.delete(id);
-    }
-
-    findAll(): Promise<Product[]> {
-        return this.productRepo.find();
-    }
 }
+
 

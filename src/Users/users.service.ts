@@ -26,13 +26,13 @@ export class UsersService {
     async createUser(createUserDto: CreateUserDto): Promise<User> {
         // Crear una nueva instancia de la entidad User y asignar propiedades desde el DTO
         const newUser = new User();
-        newUser.name = createUserDto.name;
+       /*  newUser.name = createUserDto.name;
         newUser.email = createUserDto.email;
         newUser.password = createUserDto.password; // Asegúrate de manejar el hashing en algún lugar si es necesario
         newUser.phone = createUserDto.phone ?? 0;// Si el campo es opcional
         newUser.country = createUserDto.country ?? 'Desconocido';
         newUser.address = createUserDto.address || undefined;
-        newUser.city = createUserDto.city || undefined;
+        newUser.city = createUserDto.city || undefined; */
 
         return this.userRepository.createUser(newUser);
     }

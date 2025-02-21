@@ -1,23 +1,26 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { OrderRepository } from './order.repostitory';
-import { Order } from './order.entity';
+import { Injectable } from "@nestjs/common";
+import { OrderRepository } from "./order.repostitory";
+import { Order } from "./order.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class OrderService {
     constructor(private readonly orderRepository: OrderRepository) {}
 
-    async addOrder(userId: string, productIds: string[]): Promise<{ id: string; totalAmount: number; orderDetailsId: string }> {
-        console.log('Service - User ID:', userId, 'Product IDs:', productIds);
+    async addOrder(userId: string, productData: { id: string; quantity: number }[]): Promise<{ id: string; totalAmount: number; orderDetailsId: string; status: string }> {
+        console.log("Service - User ID:", userId, "Product Data:", productData);
     
-        if (!userId || !productIds.length) {
-            throw new Error('Invalid userId or productIds');
+        if (!userId || !productData.length) {
+            throw new Error("Invalid userId or product data");
         }
     
-        const order = await this.orderRepository.createOrder(userId, productIds);
+        const order = await this.orderRepository.createOrder(userId, productData);
         return {
             id: order.id,
             totalAmount: order.totalAmount,
-            orderDetailsId: order.orderDetails.id,
+            orderDetailsId: order.orderDetails?.id,
+            status: order.orderDetails?.status,
         };
     }
 
@@ -25,6 +28,8 @@ export class OrderService {
         return await this.orderRepository.findOrderById(orderId);
     }
 }
+
+
 
 
 

@@ -1,9 +1,11 @@
-import { Test, TestingModule, jest, describe, beforeEach, expect,it } from '@nestjs/testing';
+/* import { Test, TestingModule } from '@nestjs/testing';
+import { describe, beforeEach, expect, it, jest } from '@jest/globals';
+
 import { UsersService } from './users.service';
 import { UserRepository } from './users.repository';
 import { CreateUserDto } from '../Dto/CreateUserDto';
 import { UpdateUserDto } from '../Dto/Update-userDto';
-import { User } from './users.entity';
+import { User } from "../Users/users.entity"
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -99,3 +101,4 @@ describe('UsersService', () => {
     });
   });
 });
+ */

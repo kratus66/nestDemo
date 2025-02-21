@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTable } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTable, OneToMany } from "typeorm";
 import { Category } from "../Category/category.entity";
 import { OrderDetails } from "../Order/orderDetails.entity";
 
@@ -7,7 +7,7 @@ export class Product {
     @PrimaryGeneratedColumn("uuid")
     id: string ;
 
-    @Column({ length: 50, nullable: false })
+    @Column({ type: "varchar", length: 50, nullable: false })
     name: string = '';
 
     @Column("text", { nullable: false })
@@ -21,6 +21,8 @@ export class Product {
 
     @Column({ default: "default-image.jpg" })
     imgUrl: string = 'default-image.jpg';
+
+  
 
     @ManyToOne(() => Category, (category) => category.products)
     category: Category;

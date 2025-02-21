@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, ConflictException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "./users.entity";
-import { Role } from "../constants/roles.enum";
+import { Role } from "src/constants/roles.enum";
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserRepository {
@@ -20,7 +21,6 @@ export class UserRepository {
     }
 
     async findByIdWithOrders(id: string): Promise<User> {
-        // Buscar el usuario por ID e incluir las órdenes con solo los campos necesarios
         const user = await this.userRepo.findOne({
             where: { id },
             relations: ["orders"], // Cargar las órdenes relacionadas
@@ -43,13 +43,34 @@ export class UserRepository {
     }
 
     async findByEmail(email: string): Promise<User | null> { 
-        return this.userRepo.findOne({ where: { email } });
+        const user = await this.userRepo.findOne({ where: { email } });
+
+        if (!user) {
+            console.log("Usuario no encontrado en la base de datos.");
+            return null;
+        }
+
+        console.log("Usuario encontrado:", user);
+        return user;
     }
 
     async createUser(userData: Partial<User>): Promise<User> {
-        const newUser = this.userRepo.create({...userData,role:Role.USER});
-        return this.userRepo.save(newUser);
+        const email = userData.email;
+    
+        const existingUser = await this.userRepo.findOneBy({ email });
+    
+        if (existingUser) {
+            throw new ConflictException(`Usuario registrado`);
+        }
+    
+        const newUser = this.userRepo.create({
+            ...userData,
+            role: (Object.values(Role).includes(userData.role as Role) ? userData.role : Role.USER) as Role, // ✅ Se asegura de que role sea del tipo Role
+        });
+    
+        return await this.userRepo.save(newUser); // ✅ Asegurar que retorna un User válido
     }
+    
 
     async updateUser(id: string, updateUser: Partial<User>): Promise<User | null> {
         await this.userRepo.update(id, updateUser);
@@ -60,4 +81,3 @@ export class UserRepository {
         await this.userRepo.delete(id);
     }
 }
-

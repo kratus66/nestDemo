@@ -1,22 +1,24 @@
 {
   "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2021",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "baseUrl": "./",
     "paths": {
       "src/*": ["./src/*"]
     },
-    "typeRoots": ["./node_modules/@types", "./types"],
-    "types": ["node", "jest", "multer"],
-    "module": "commonjs",
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["node", "jest"],
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "target": "ES2021",
     "strict": true,
     "sourceMap": true,
-    "outDir": "./dist",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
@@ -25,5 +27,5 @@
     "strictPropertyInitialization": false
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.spec.ts"]
+  "exclude": ["node_modules", "dist"]
 }

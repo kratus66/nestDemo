@@ -74,6 +74,13 @@ export class RegisterUserDto {
   })
   country?: string;
 
+  @IsString()
+  @ApiProperty({
+      description:"debe de seleccionar un rol",
+      example:"User o Admin"
+  })
+  role: Role
+
  
 }
 

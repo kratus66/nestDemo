@@ -1,16 +1,18 @@
+import "reflect-metadata"
 import { Module} from '@nestjs/common';
 import { AuthModule } from './Auth/auth.module';
 import { UserModule } from './Users/user.module';
 import { ProductModule } from './Products/products.module';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-
+import { SeederService } from "./data/seeder.service";
 import { CategoryModule } from './Category/category.module';
 import { FilesModule } from './Cloudinary/files.module';
 import { JwtModule } from '@nestjs/jwt';
 import { OrderModule } from './Order/order.module';
-import AppDataSource from './config/typeorm';
-
+import {AppDataSource} from './config/typeorm';
+import { Category } from "./Category/category.entity";
+import { Product } from "./Products/product.entity";
 
 @Module({
     imports: [
@@ -19,6 +21,7 @@ import AppDataSource from './config/typeorm';
             
         }),
         TypeOrmModule.forRoot(AppDataSource.options),
+        TypeOrmModule.forFeature([Category, Product]),
 
        
         JwtModule.registerAsync({
@@ -35,6 +38,7 @@ import AppDataSource from './config/typeorm';
         CategoryModule,
         FilesModule,
     ],
+    providers: [SeederService],
 })
 export class AppModule {
     constructor() {

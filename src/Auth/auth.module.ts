@@ -3,20 +3,24 @@ import { AuthService } from "../Users/auth.service";
 import { AuthController } from "./auth.controller";
 import { UserRepository } from "../Users/users.repository";
 import { JwtModule } from "@nestjs/jwt";
-
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "src/Users/users.entity";
+import { AuthGuard } from "./auth.guard";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([User]),  // Inyecta la entidad User en el UsersRepository
+        ConfigModule.forRoot(), // ✅ Carga las variables de entorno
+        TypeOrmModule.forFeature([User]),  
         JwtModule.register({
-            secret: process.env.JWT_SECRET || 'yourSecretKey',  // Define el secreto para firmar el token
-            signOptions: { expiresIn: '1h' },  // Opcional: tiempo de expiración del token
+            secret: process.env.JWT_SECRET,  // ✅ Se asegura de que usa el mismo JWT_SECRET del .env
+            signOptions: { expiresIn: '1h' },  
         }),
     ],
-    providers: [AuthService, UserRepository],
+    providers: [AuthService, UserRepository, AuthGuard],
     controllers: [AuthController],
-    exports: [JwtModule, AuthService],
+    exports: [JwtModule, AuthService, AuthGuard],
 })
 export class AuthModule {}
+
+

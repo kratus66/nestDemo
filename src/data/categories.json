@@ -1,6 +1,10 @@
 [
     { "name": "Electrónica" },
     { "name": "Libros" },
-    { "name": "Ropa" }
+    { "name": "Ropa" },
+    {"name":"monitor"},
+    {"name":"keyboard"},
+    {"name":"mouse"},
+    { "name": "smartphone" }
 ]
 
