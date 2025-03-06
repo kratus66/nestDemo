@@ -7,18 +7,16 @@
     "test": "test"
   },
   "scripts": {
-    "build": "nest build",
+    "build": "rimraf dist && tsc && cpx \"src/**/*\" dist"
+,
     "start": "node dist/main.js",
     "start:dev": "ts-node -r tsconfig-paths/register src/main.ts",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "typeorm": "npx typeorm",
     "migration:generate": "npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli migration:generate -d ./src/config/typeorm.ts",
-
-
-     "migration:run": "npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli migration:run -d ./src/config/typeorm.ts",
+    "migration:run": "npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli migration:run -d ./src/config/typeorm.ts",
     "migration:revert": "npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli migration:revert -d ./src/config/typeorm.ts"
-
   },
   "keywords": [],
   "author": "",
@@ -58,10 +56,13 @@
     "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^8.16.0",
     "@typescript-eslint/parser": "^8.16.0",
+    "cpx": "^1.5.0",
     "eslint": "^9.16.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "jest": "^29.7.0",
+    "mkdirp": "^3.0.1",
+    "ncp": "^2.0.0",
     "prettier": "^3.4.1",
     "source-map-support": "^0.5.21",
     "supertest": "^7.0.0",

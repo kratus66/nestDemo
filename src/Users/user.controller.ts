@@ -23,6 +23,8 @@ import { Roles } from '../decorators/roles.decorator';
 /* import { Role } from '../constants/roles.enum'; */
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiQuery} from '@nestjs/swagger';
 import { UserWithOutPassword } from 'src/Dto/userWithOutPassword';
+import { RolesGuard } from 'src/guard/rolesGuard';
+import{Role}from"./constants/roles.enum";
 
 @ApiTags('users')
 @Controller('users')
@@ -76,7 +78,8 @@ async getUsers(
     }
 
     @ApiBearerAuth()
-    @UseGuards(AuthGuard) 
+    @Roles(Role.ADMIN)
+    @UseGuards(AuthGuard, RolesGuard) 
     @Get(':id')
     @ApiOperation({ summary: 'Obtener usuario por ID' })
     async getUserById(

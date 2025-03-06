@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, ConflictException } from "@nestjs/common
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "./users.entity";
-import { Role } from "src/constants/roles.enum";
+import { Role } from "src/Users/constants/roles.enum";
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class UserRepository {
     async findByIdWithOrders(id: string): Promise<User> {
         const user = await this.userRepo.findOne({
             where: { id },
-            relations: ["orders"], // Cargar las órdenes relacionadas
+            relations: ["orders"],
             select: {
                 id: true,
                 name: true,
@@ -34,14 +34,14 @@ export class UserRepository {
                 },
             },
         });
-
+    
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
-
-        return user;
+    
+        return user; // ✅ No devuelve `role`
     }
-
+    
     async findByEmail(email: string): Promise<User | null> { 
         const user = await this.userRepo.findOne({ where: { email } });
 

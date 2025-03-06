@@ -8,7 +8,7 @@ import {
   IsEnum
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import {Role} from '../constants/roles.enum';
+import {Role} from '../Users/constants/roles.enum';
 
 export class RegisterUserDto {
   @IsString()
@@ -77,7 +77,7 @@ export class RegisterUserDto {
   @IsString()
   @ApiProperty({
       description:"debe de seleccionar un rol",
-      example:"User o Admin"
+      example:"user o admin"
   })
   role: Role
 

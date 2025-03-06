@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { Order } from "../Order/order.entity";
-import { Role } from "../constants/roles.enum"; // Importamos correctamente el enum
+import { Role } from "./constants/roles.enum"; // Importamos correctamente el enum
 
 @Entity({ name: "users" })
 export class User {

@@ -1,10 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, HttpException,HttpStatus } from '@nestjs/common';
 import { UserRepository } from './users.repository';
 import { JwtService } from '@nestjs/jwt';
 import { User } from './users.entity';
 import { RegisterUserDto } from 'src/Dto/RegisterUserDto';
 import * as bcrypt from 'bcrypt';
-import { Role } from 'src/constants/roles.enum';
+import { Role } from 'src/Users/constants/roles.enum';
 
 @Injectable()
 export class AuthService {
@@ -37,16 +37,25 @@ export class AuthService {
   async signup(registerUserDto: RegisterUserDto): Promise<Omit<User, 'password'>> {
     const { password, role, ...userData } = registerUserDto;
 
+    // Si el rol es "admin", verificar que el usuario autenticado sea administrador
+    if (role === Role.ADMIN) {
+        throw new HttpException(
+            'Solo los administradores pueden crear otros administradores',
+            HttpStatus.FORBIDDEN,
+        );
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await this.userRepository.createUser({
-      ...userData,
-      password: hashedPassword,
-      role: (Object.values(Role).includes(role as Role) ? role : Role.USER) as Role, // ✅ Convertimos role correctamente
+        ...userData,
+        password: hashedPassword,
+        role: role,
     });
 
     const { password: _, ...userWithoutPassword } = newUser;
     return userWithoutPassword;
 }
+
 
 
   async generateJwtToken(user: User): Promise<string> {
