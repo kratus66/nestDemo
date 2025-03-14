@@ -48,9 +48,9 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   async signup(@Body() registerUserDto: RegisterUserDto, @Req() req: Request, @Res() res: Response) {
     
-    // Si el rol es "admin", verificar autenticación
+    // No es necesario verificar el rol aquí, ya se hace con los guardias
     if (registerUserDto.role === Role.ADMIN) {
-      const authHeader = req.headers['authorization'] as string; // Type assertion
+      const authHeader = req.headers['authorization'] as string;
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
         throw new HttpException(
           'Authorization header must start with "Bearer "',
@@ -80,6 +80,7 @@ export class AuthController {
     const userWithoutPassword = await this.authService.signup(registerUserDto);
     return res.status(HttpStatus.CREATED).json(userWithoutPassword);
   }
+
   @Post('protected-endpoint')
   @ApiOperation({ summary: 'Endpoint protegido solo para administradores' })
   @UseGuards(AuthGuard, RolesGuard)
